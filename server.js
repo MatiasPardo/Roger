@@ -95,7 +95,99 @@ function initializeAttendanceList() {
     }
 }
 
+// Base de datos en memoria para usuarios (en producción usar una base de datos real)
+let users = [];
+const usersPath = path.join(__dirname, 'users.json');
+
+// Cargar usuarios existentes
+function loadUsers() {
+    if (fs.existsSync(usersPath)) {
+        try {
+            users = JSON.parse(fs.readFileSync(usersPath, 'utf8'));
+        } catch (error) {
+            console.log('Error cargando usuarios, iniciando con array vacío');
+            users = [];
+        }
+    }
+}
+
+// Guardar usuarios
+function saveUsers() {
+    fs.writeFileSync(usersPath, JSON.stringify(users, null, 2));
+}
+
 // Endpoints
+app.post('/api/auth/register', (req, res) => {
+    try {
+        const { username, email, password, firstName, lastName, birthDate } = req.body;
+        
+        // Verificar si el email ya existe
+        if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+            return res.status(400).json({ error: 'Este email ya está registrado' });
+        }
+        
+        // Validar contraseña
+        if (password.length < 8 || !/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+            return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres, letras y números' });
+        }
+        
+        const newUser = {
+            id: Date.now().toString(),
+            username,
+            email,
+            password, // En producción, hashear la contraseña
+            firstName,
+            lastName,
+            birthDate,
+            registrationDate: new Date().toISOString()
+        };
+        
+        users.push(newUser);
+        saveUsers();
+        
+        // No devolver la contraseña
+        const { password: _, ...userResponse } = newUser;
+        res.json({ success: true, user: userResponse });
+    } catch (error) {
+        res.status(500).json({ error: 'Error en el registro' });
+    }
+});
+
+app.post('/api/auth/login', (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        // Verificar admin
+        if (email.toLowerCase() === 'admin' && password === 'adminRoger1234') {
+            return res.json({ 
+                success: true, 
+                user: { 
+                    email: 'admin', 
+                    username: 'admin', 
+                    firstName: 'Admin', 
+                    lastName: 'System',
+                    isAdmin: true 
+                } 
+            });
+        }
+        
+        // Buscar usuario
+        const user = users.find(u => 
+            u.email.toLowerCase() === email.toLowerCase() && 
+            u.password === password
+        );
+        
+        if (user) {
+            const { password: _, ...userResponse } = user;
+            res.json({ success: true, user: userResponse });
+        } else {
+            res.status(401).json({ error: 'Credenciales incorrectas' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error en el login' });
+    }
+});
+
 app.post('/api/users', (req, res) => {
     const userData = req.body;
     const filename = `usuarios_${new Date().toISOString().split('T')[0]}.json`;
@@ -236,6 +328,7 @@ app.post('/api/admin/login', (req, res) => {
 // Inicializar al arrancar
 initializeGiftList();
 initializeAttendanceList();
+loadUsers();
 
 app.listen(3001, () => {
     console.log('Servidor ejecutándose en http://localhost:3001');

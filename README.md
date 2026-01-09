@@ -6,7 +6,7 @@
 
 ## Ejecución
 1. Iniciar el servidor: `npm start`
-2. Abrir navegador en: http://localhost:3000
+2. Abrir navegador en: http://localhost:3001
 3. Los archivos de usuarios se guardarán automáticamente en el directorio del proyecto
 
 ## Desarrollo

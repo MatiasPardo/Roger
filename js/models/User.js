@@ -1,40 +1,6 @@
 class User {
     constructor() {
-        this.storageKey = 'registeredUsers';
-        this.loadUsers();
-    }
-
-    loadUsers() {
-        const stored = localStorage.getItem(this.storageKey);
-        this.users = stored ? JSON.parse(stored) : [];
-    }
-
-    async saveUsers() {
-        localStorage.setItem(this.storageKey, JSON.stringify(this.users));
-        await this.saveToFile();
-    }
-
-    async saveToFile() {
-        const userData = {
-            timestamp: new Date().toISOString(),
-            users: this.users.map(user => ({
-                username: user.username,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                birthDate: user.birthDate,
-                registrationDate: user.registrationDate
-            }))
-        };
-        
-        try {
-            await fetch('/api/users', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData)
-            });
-        } catch (error) {
-            console.error('Error guardando archivo:', error);
-        }
+        // Ya no almacenamos usuarios en localStorage
     }
 
     validatePassword(password) {
@@ -58,55 +24,44 @@ class User {
     }
 
     async register(userData) {
-        if (this.emailExists(userData.email)) {
-            return { success: false, message: 'Este email ya está registrado' };
+        try {
+            const response = await fetch('http://localhost:3001/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                return { success: true, message: 'Usuario registrado exitosamente', user: result.user };
+            } else {
+                return { success: false, message: result.error };
+            }
+        } catch (error) {
+            console.error('Error en registro:', error);
+            return { success: false, message: 'Error de conexión con el servidor' };
         }
-        
-        const passwordValidation = this.validatePassword(userData.password);
-        if (!passwordValidation.valid) {
-            return { success: false, message: passwordValidation.message };
-        }
-        
-        const newUser = {
-            ...userData,
-            registrationDate: new Date().toISOString(),
-            id: Date.now().toString()
-        };
-        
-        this.users.push(newUser);
-        await this.saveUsers();
-        
-        return { success: true, message: 'Usuario registrado exitosamente', user: newUser };
     }
 
-    authenticate(email, password) {
-        // Verificar si es admin
-        if (email.toLowerCase() === 'admin' && password === 'adminRoger1234') {
-            return { 
-                success: true, 
-                user: { 
-                    email: 'admin', 
-                    username: 'admin', 
-                    firstName: 'Admin', 
-                    lastName: 'System',
-                    isAdmin: true 
-                } 
-            };
+    async authenticate(email, password) {
+        try {
+            const response = await fetch('http://localhost:3001/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                return { success: true, user: result.user };
+            } else {
+                return { success: false, message: result.error };
+            }
+        } catch (error) {
+            console.error('Error en autenticación:', error);
+            return { success: false, message: 'Error de conexión con el servidor' };
         }
-        
-        // Autenticación normal
-        const user = this.users.find(u => 
-            u.email.toLowerCase() === email.toLowerCase() && 
-            u.password === password
-        );
-        return user ? { success: true, user: user } : { success: false };
-    }
-
-    emailExists(email) {
-        return this.users.some(u => u.email.toLowerCase() === email.toLowerCase());
-    }
-
-    getUserData(email) {
-        return this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
     }
 }

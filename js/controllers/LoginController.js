@@ -40,16 +40,18 @@ class LoginController {
         // Mostrar estado de carga
         this.loginView.showLoadingState();
 
-        // Simular delay de autenticación para mejor UX
-        setTimeout(() => {
-            const result = this.userModel.authenticate(email, password);
+        try {
+            const result = await this.userModel.authenticate(email, password);
             
             if (result.success) {
                 this.handleSuccessfulLogin(result.user);
             } else {
-                this.handleFailedLogin();
+                this.handleFailedLogin(result.message);
             }
-        }, 1500);
+        } catch (error) {
+            console.error('Error en login:', error);
+            this.handleFailedLogin('Error de conexión');
+        }
     }
 
     handleSuccessfulLogin(user) {
@@ -71,7 +73,10 @@ class LoginController {
         sessionManager.createSession({
             username: user.username,
             email: user.email,
-            fullName: `${user.firstName} ${user.lastName}`
+            fullName: user.fullName || `${user.firstName} ${user.lastName}`,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            isAdmin: user.isAdmin
         });
         
         console.log('Datos guardados en localStorage:');
@@ -84,8 +89,8 @@ class LoginController {
         }, 2000);
     }
 
-    handleFailedLogin() {
-        this.loginView.showMessage('Credenciales incorrectas. Verifica tu información.', 'error');
+    handleFailedLogin(message = 'Credenciales incorrectas. Verifica tu información.') {
+        this.loginView.showMessage(message, 'error');
         this.shakeForm();
         this.clearForm();
     }

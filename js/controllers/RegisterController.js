@@ -14,14 +14,6 @@ class RegisterController {
             });
         }
 
-        // Validación en tiempo real del username
-        const usernameInput = document.getElementById('username');
-        if (usernameInput) {
-            usernameInput.addEventListener('blur', () => {
-                this.checkUsernameAvailability();
-            });
-        }
-
         // Navegación con teclado
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
@@ -30,55 +22,6 @@ class RegisterController {
         });
 
         this.showEntryAnimation();
-    }
-
-    async checkUsernameAvailability() {
-        const username = document.getElementById('username').value.trim();
-        if (username.length < 3) return;
-
-        if (this.userModel.userExists(username)) {
-            this.showUsernameError('Este usuario ya existe');
-        } else {
-            this.showUsernameSuccess('Usuario disponible');
-        }
-    }
-
-    showUsernameError(message) {
-        const usernameGroup = document.getElementById('username').parentElement;
-        const existingError = usernameGroup.querySelector('.username-availability');
-        if (existingError) existingError.remove();
-
-        const error = document.createElement('div');
-        error.className = 'username-availability';
-        error.style.cssText = `
-            position: absolute;
-            bottom: -25px;
-            left: 0;
-            color: #ff4444;
-            font-size: 0.8rem;
-            opacity: 1;
-        `;
-        error.textContent = message;
-        usernameGroup.appendChild(error);
-    }
-
-    showUsernameSuccess(message) {
-        const usernameGroup = document.getElementById('username').parentElement;
-        const existingError = usernameGroup.querySelector('.username-availability');
-        if (existingError) existingError.remove();
-
-        const success = document.createElement('div');
-        success.className = 'username-availability';
-        success.style.cssText = `
-            position: absolute;
-            bottom: -25px;
-            left: 0;
-            color: #00ff00;
-            font-size: 0.8rem;
-            opacity: 1;
-        `;
-        success.textContent = message;
-        usernameGroup.appendChild(success);
     }
 
     async handleRegister() {
@@ -92,7 +35,7 @@ class RegisterController {
 
         this.registerView.showLoadingState();
 
-        setTimeout(async () => {
+        try {
             const result = await this.userModel.register(formData);
             
             if (result.success) {
@@ -100,7 +43,10 @@ class RegisterController {
             } else {
                 this.handleFailedRegister(result.message);
             }
-        }, 1500);
+        } catch (error) {
+            console.error('Error en registro:', error);
+            this.handleFailedRegister('Error de conexión con el servidor');
+        }
     }
 
     getFormData() {
@@ -119,10 +65,6 @@ class RegisterController {
 
         if (data.username.length < 3) {
             errors.push('El usuario debe tener al menos 3 caracteres');
-        }
-
-        if (this.userModel.emailExists(data.email)) {
-            errors.push('Este email ya está registrado');
         }
 
         if (!this.isValidEmail(data.email)) {
@@ -170,7 +112,9 @@ class RegisterController {
         sessionManager.createSession({
             username: result.user.username,
             email: result.user.email,
-            fullName: `${result.user.firstName} ${result.user.lastName}`
+            fullName: `${result.user.firstName} ${result.user.lastName}`,
+            firstName: result.user.firstName,
+            lastName: result.user.lastName
         });
         
         console.log('Datos guardados en localStorage (registro):');

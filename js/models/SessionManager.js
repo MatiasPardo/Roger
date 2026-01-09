@@ -8,7 +8,14 @@ class SessionManager {
         const sessionId = this.generateSessionId();
         const sessionData = {
             sessionId: sessionId,
-            userData: userData,
+            userData: {
+                username: userData.username,
+                email: userData.email,
+                fullName: userData.fullName,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                isAdmin: userData.isAdmin
+            },
             createdAt: new Date().toISOString(),
             expiresAt: new Date(Date.now() + this.sessionDuration).toISOString(),
             lastActivity: new Date().toISOString()
