@@ -57,6 +57,21 @@ class LoginController {
     handleSuccessfulLogin(user) {
         if (user.isAdmin) {
             this.loginView.showMessage('Acceso de administrador autorizado', 'success');
+            
+            // Crear sesión de admin
+            const sessionManager = new SessionManager();
+            sessionManager.createSession({
+                username: user.username,
+                email: user.email,
+                fullName: `${user.firstName} ${user.lastName}`,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                isAdmin: user.isAdmin
+            });
+            
+            // Marcar como admin en localStorage
+            localStorage.setItem('isAdmin', 'true');
+            
             setTimeout(() => {
                 window.location.href = 'admin.html';
             }, 1500);

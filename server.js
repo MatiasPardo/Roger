@@ -159,11 +159,11 @@ app.post('/api/auth/login', (req, res) => {
         const { email, password } = req.body;
         
         // Verificar admin
-        if (email.toLowerCase() === 'admin@admin.com' && password === 'adminRoger1234') {
+        if (email.toLowerCase() === 'admin' && password === 'adminRoger1234') {
             return res.json({ 
                 success: true, 
                 user: { 
-                    email: 'admin@admin.com', 
+                    email: 'admin', 
                     username: 'admin', 
                     firstName: 'Admin', 
                     lastName: 'System',

@@ -40,32 +40,21 @@ class AdminPanel {
     async handleAdminLogin() {
         const username = document.getElementById('adminUsername').value.trim();
         const password = document.getElementById('adminPassword').value.trim();
-        const messageDiv = document.getElementById('adminMessage');
 
         if (!username || !password) {
             this.showMessage('Completa todos los campos', 'error');
             return;
         }
 
-        try {
-            const response = await fetch('/api/admin/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-
-            if (response.ok) {
-                const result = await response.json();
-                localStorage.setItem('isAdmin', 'true');
-                this.showMessage('Acceso autorizado', 'success');
-                setTimeout(() => {
-                    this.showAdminPanel();
-                }, 1000);
-            } else {
-                this.showMessage('Credenciales incorrectas', 'error');
-            }
-        } catch (error) {
-            this.showMessage('Error de conexión', 'error');
+        // Verificar credenciales de admin directamente
+        if (username === 'admin' && password === 'adminRoger1234') {
+            localStorage.setItem('isAdmin', 'true');
+            this.showMessage('Acceso autorizado', 'success');
+            setTimeout(() => {
+                this.showAdminPanel();
+            }, 1000);
+        } else {
+            this.showMessage('Credenciales incorrectas', 'error');
         }
     }
 
@@ -106,7 +95,7 @@ class AdminPanel {
 
     async loadAdminData() {
         try {
-            const response = await fetch('/api/admin/dashboard');
+            const response = await fetch('http://localhost:3001/api/admin/dashboard');
             const data = await response.json();
             
             this.updateAttendanceStats(data.users, data.confirmations);
