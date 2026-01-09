@@ -375,11 +375,13 @@ class BabyShowerController {
         rightSection.style.alignItems = 'center';
         rightSection.style.gap = '10px';
         
+        const userEmail = localStorage.getItem('userEmail');
+        const canEdit = gift.reserved && gift.reservedBy && gift.reservedBy.email === userEmail;
+        
         if (gift.reserved) {
             const giftStatus = document.createElement('span');
             giftStatus.className = 'gift-status reserved';
             
-            // Mostrar quién lo regala siempre (no solo para admin)
             if (gift.reservedBy) {
                 giftStatus.textContent = `Regala: ${gift.reservedBy.fullName || gift.reservedBy.username}`;
             } else {
@@ -387,6 +389,18 @@ class BabyShowerController {
             }
             
             rightSection.appendChild(giftStatus);
+            
+            // Botón editar solo para el usuario que reservó
+            if (canEdit) {
+                const editBtn = document.createElement('button');
+                editBtn.className = 'edit-btn';
+                editBtn.textContent = '✏️';
+                editBtn.title = 'Editar regalo';
+                editBtn.addEventListener('click', () => {
+                    this.editGift(gift.id, gift.name);
+                });
+                rightSection.appendChild(editBtn);
+            }
         } else {
             const giftStatus = document.createElement('span');
             giftStatus.className = 'gift-status available';
@@ -504,6 +518,66 @@ class BabyShowerController {
             setTimeout(() => {
                 successMsg.remove();
             }, 3000);
+        }
+    }
+
+    editGift(giftId, currentName) {
+        const newName = prompt('Modificar nombre del regalo:', currentName);
+        if (newName && newName.trim() && newName.trim() !== currentName) {
+            this.updateGift(giftId, newName.trim());
+        }
+    }
+
+    async updateGift(giftId, newName) {
+        const userInfo = {
+            username: localStorage.getItem('username'),
+            email: localStorage.getItem('userEmail'),
+            fullName: localStorage.getItem('userFullName')
+        };
+        
+        const success = await this.giftListModel.updateGift(giftId, newName, userInfo);
+        if (success) {
+            this.loadGiftList();
+            
+            const successMsg = document.createElement('div');
+            successMsg.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(0, 255, 0, 0.9);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                z-index: 3000;
+                font-family: 'Orbitron', monospace;
+                animation: slideInRight 0.5s ease, fadeOut 0.5s ease 3s forwards;
+            `;
+            successMsg.textContent = '¡Regalo modificado exitosamente! 🎁';
+            document.body.appendChild(successMsg);
+            
+            setTimeout(() => {
+                successMsg.remove();
+            }, 4000);
+        } else {
+            const errorMsg = document.createElement('div');
+            errorMsg.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(255, 0, 0, 0.9);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                z-index: 3000;
+                font-family: 'Orbitron', monospace;
+                animation: slideInRight 0.5s ease, fadeOut 0.5s ease 3s forwards;
+            `;
+            errorMsg.textContent = 'Error al modificar el regalo';
+            document.body.appendChild(errorMsg);
+            
+            setTimeout(() => {
+                errorMsg.remove();
+            }, 4000);
         }
     }
 }
