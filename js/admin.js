@@ -95,7 +95,7 @@ class AdminPanel {
 
     async loadAdminData() {
         try {
-            const response = await fetch('http://localhost:3001/api/admin/dashboard');
+            const response = await fetch('/api/admin/dashboard');
             const data = await response.json();
             
             this.updateAttendanceStats(data.users, data.confirmations);
