@@ -201,7 +201,11 @@ app.get('/api/admin/users', (req, res) => {
 app.delete('/api/admin/users/:userId', (req, res) => {
     try {
         const { userId } = req.params;
+        console.log('DELETE user - userId recibido:', userId);
+        console.log('Usuarios disponibles:', users.map(u => ({ id: u.id, email: u.email })));
+        
         const userIndex = users.findIndex(u => u.id === userId);
+        console.log('userIndex encontrado:', userIndex);
         
         if (userIndex === -1) {
             return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -211,6 +215,7 @@ app.delete('/api/admin/users/:userId', (req, res) => {
         saveUsers();
         res.json({ success: true });
     } catch (error) {
+        console.error('Error en DELETE user:', error);
         res.status(500).json({ error: 'Error al eliminar usuario' });
     }
 });
@@ -235,12 +240,16 @@ app.put('/api/admin/users/:userId/reset-password', (req, res) => {
 app.delete('/api/admin/gifts/:giftId', (req, res) => {
     try {
         const { giftId } = req.params;
+        console.log('DELETE gift - giftId recibido:', giftId, 'tipo:', typeof giftId);
+        
         const giftData = JSON.parse(fs.readFileSync(giftListPath, 'utf8'));
         
         let giftFound = false;
         for (const category in giftData.gifts) {
+            console.log(`Buscando en categoría ${category}:`, giftData.gifts[category].map(g => ({ id: g.id, name: g.name })));
             const giftIndex = giftData.gifts[category].findIndex(g => g.id === parseInt(giftId));
             if (giftIndex !== -1) {
+                console.log('Regalo encontrado en índice:', giftIndex);
                 giftData.gifts[category].splice(giftIndex, 1);
                 giftFound = true;
                 break;
@@ -252,9 +261,11 @@ app.delete('/api/admin/gifts/:giftId', (req, res) => {
             fs.writeFileSync(giftListPath, JSON.stringify(giftData, null, 2));
             res.json({ success: true });
         } else {
+            console.log('Regalo no encontrado con ID:', giftId);
             res.status(404).json({ error: 'Regalo no encontrado' });
         }
     } catch (error) {
+        console.error('Error en DELETE gift:', error);
         res.status(500).json({ error: 'Error al eliminar regalo' });
     }
 });

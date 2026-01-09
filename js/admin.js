@@ -246,6 +246,7 @@ class AdminPanel {
     }
 
     async deleteUser(userId) {
+        console.log('Eliminando usuario con ID:', userId);
         if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
         
         try {
@@ -256,8 +257,13 @@ class AdminPanel {
             if (response.ok) {
                 this.showMessage('Usuario eliminado', 'success');
                 this.loadAdminData();
+            } else {
+                const error = await response.text();
+                console.error('Error del servidor:', error);
+                this.showMessage('Error al eliminar usuario', 'error');
             }
         } catch (error) {
+            console.error('Error en deleteUser:', error);
             this.showMessage('Error al eliminar usuario', 'error');
         }
     }
@@ -272,13 +278,19 @@ class AdminPanel {
             
             if (response.ok) {
                 this.showMessage('Contraseña reseteada a "roger1234"', 'success');
+            } else {
+                const error = await response.text();
+                console.error('Error del servidor:', error);
+                this.showMessage('Error al resetear contraseña', 'error');
             }
         } catch (error) {
+            console.error('Error en resetPassword:', error);
             this.showMessage('Error al resetear contraseña', 'error');
         }
     }
 
     async deleteGift(giftId) {
+        console.log('Eliminando regalo con ID:', giftId);
         if (!confirm('¿Estás seguro de eliminar este regalo?')) return;
         
         try {
@@ -289,8 +301,13 @@ class AdminPanel {
             if (response.ok) {
                 this.showMessage('Regalo eliminado', 'success');
                 this.loadAdminData();
+            } else {
+                const error = await response.text();
+                console.error('Error del servidor:', error);
+                this.showMessage('Error al eliminar regalo', 'error');
             }
         } catch (error) {
+            console.error('Error en deleteGift:', error);
             this.showMessage('Error al eliminar regalo', 'error');
         }
     }

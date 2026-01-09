@@ -38,7 +38,7 @@ class LoginController {
         }
 
         // Mostrar estado de carga
-        this.loginView.showLoadingState();
+        this.showLoadingState();
 
         try {
             const result = await this.userModel.authenticate(email, password);
@@ -51,6 +51,8 @@ class LoginController {
         } catch (error) {
             console.error('Error en login:', error);
             this.handleFailedLogin('Error de conexión');
+        } finally {
+            this.hideLoadingState();
         }
     }
 
@@ -235,5 +237,39 @@ class LoginController {
                 window.location.href = 'babyshower.html';
             }, 500);
         }
+    }
+
+    showLoadingState() {
+        const button = document.querySelector('.login-btn');
+        this.originalButtonText = button.innerHTML;
+        
+        button.innerHTML = `
+            <span style="display: inline-flex; align-items: center;">
+                <div style="width: 20px; height: 20px; border: 2px solid transparent; border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px;"></div>
+                VERIFICANDO...
+            </span>
+        `;
+        
+        button.disabled = true;
+
+        if (!document.querySelector('#spin-animation')) {
+            const style = document.createElement('style');
+            style.id = 'spin-animation';
+            style.textContent = `
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    hideLoadingState() {
+        const button = document.querySelector('.login-btn');
+        if (this.originalButtonText) {
+            button.innerHTML = this.originalButtonText;
+        }
+        button.disabled = false;
     }
 }
