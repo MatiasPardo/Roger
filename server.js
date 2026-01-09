@@ -237,8 +237,8 @@ app.post('/api/admin/login', (req, res) => {
 initializeGiftList();
 initializeAttendanceList();
 
-app.listen(3000, () => {
-    console.log('Servidor ejecutándose en http://localhost:3000');
+app.listen(3001, () => {
+    console.log('Servidor ejecutándose en http://localhost:3001');
     console.log('Lista de regalos disponible en /api/gifts');
     console.log('Confirmaciones de asistencia en /api/attendance');
 });
