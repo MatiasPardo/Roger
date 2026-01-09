@@ -8,7 +8,7 @@ class GiftList {
 
     async loadGifts() {
         try {
-            const response = await fetch('https://pardos.com.ar/api/gifts');
+            const response = await fetch('/api/gifts');
             if (response.ok) {
                 const data = await response.json();
                 this.gifts = data.gifts;
@@ -100,7 +100,7 @@ class GiftList {
 
     async addGift(category, giftName, userInfo) {
         try {
-            const response = await fetch('https://pardos.com.ar/api/gifts/add', {
+            const response = await fetch('/api/gifts/add', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ category, giftName, userInfo })
@@ -124,7 +124,7 @@ class GiftList {
 
     async reserveGift(giftId, userInfo) {
         try {
-            const response = await fetch('https://pardos.com.ar/api/gifts/reserve', {
+            const response = await fetch('/api/gifts/reserve', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ giftId, userInfo })

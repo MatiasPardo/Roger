@@ -25,7 +25,7 @@ class User {
 
     async register(userData) {
         try {
-            const response = await fetch('https://pardos.com.ar/api/auth/register', {
+            const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData)
@@ -46,7 +46,7 @@ class User {
 
     async authenticate(email, password) {
         try {
-            const response = await fetch('https://pardos.com.ar/api/auth/login', {
+            const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
