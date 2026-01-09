@@ -28,6 +28,13 @@ class AdminPanel {
                 this.switchTab(e.target.dataset.tab);
             });
         });
+
+        // Botones de agregar
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'addGiftBtn') {
+                this.showAddGiftModal();
+            }
+        });
     }
 
     checkAdminSession() {
@@ -172,6 +179,10 @@ class AdminPanel {
                 <td>${user.email}</td>
                 <td>${dateHtml}</td>
                 <td>${statusHtml}</td>
+                <td>
+                    <button onclick="adminPanel.resetPassword('${user.id}')" class="login-btn" style="margin: 2px; padding: 5px 10px; font-size: 12px;">🔄 Reset</button>
+                    <button onclick="adminPanel.deleteUser('${user.id}')" class="login-btn" style="margin: 2px; padding: 5px 10px; font-size: 12px; background: #ff4444;">🗑️</button>
+                </td>
             `;
             tbody.appendChild(row);
         });
@@ -214,6 +225,9 @@ class AdminPanel {
                     <td>${statusHtml}</td>
                     <td>${reservedByHtml}</td>
                     <td>${reservedDateHtml}</td>
+                    <td>
+                        <button onclick="adminPanel.deleteGift(${gift.id})" class="login-btn" style="margin: 2px; padding: 5px 10px; font-size: 12px; background: #ff4444;">🗑️</button>
+                    </td>
                 `;
                 tbody.appendChild(row);
             });
@@ -230,9 +244,90 @@ class AdminPanel {
             messageDiv.className = 'message';
         }, 3000);
     }
+
+    async deleteUser(userId) {
+        if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
+        
+        try {
+            const response = await fetch(`http://localhost:3001/api/admin/users/${userId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                this.showMessage('Usuario eliminado', 'success');
+                this.loadAdminData();
+            }
+        } catch (error) {
+            this.showMessage('Error al eliminar usuario', 'error');
+        }
+    }
+
+    async resetPassword(userId) {
+        if (!confirm('¿Resetear contraseña a "roger1234"?')) return;
+        
+        try {
+            const response = await fetch(`http://localhost:3001/api/admin/users/${userId}/reset-password`, {
+                method: 'PUT'
+            });
+            
+            if (response.ok) {
+                this.showMessage('Contraseña reseteada a "roger1234"', 'success');
+            }
+        } catch (error) {
+            this.showMessage('Error al resetear contraseña', 'error');
+        }
+    }
+
+    async deleteGift(giftId) {
+        if (!confirm('¿Estás seguro de eliminar este regalo?')) return;
+        
+        try {
+            const response = await fetch(`http://localhost:3001/api/admin/gifts/${giftId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                this.showMessage('Regalo eliminado', 'success');
+                this.loadAdminData();
+            }
+        } catch (error) {
+            this.showMessage('Error al eliminar regalo', 'error');
+        }
+    }
+
+    showAddGiftModal() {
+        const giftName = prompt('Nombre del regalo:');
+        const category = prompt('Categoría (baby/mom/home):');
+        
+        if (giftName && category && ['baby', 'mom', 'home'].includes(category)) {
+            this.addGift(category, giftName);
+        } else {
+            this.showMessage('Datos inválidos', 'error');
+        }
+    }
+
+    async addGift(category, giftName) {
+        try {
+            const response = await fetch('http://localhost:3001/api/admin/gifts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category, giftName })
+            });
+            
+            if (response.ok) {
+                this.showMessage('Regalo agregado', 'success');
+                this.loadAdminData();
+            }
+        } catch (error) {
+            this.showMessage('Error al agregar regalo', 'error');
+        }
+    }
 }
+
+// Variable global para acceso desde botones
+let adminPanel;
 
 // Inicializar cuando se carga la página
 document.addEventListener('DOMContentLoaded', () => {
-    new AdminPanel();
+    adminPanel = new AdminPanel();
 });

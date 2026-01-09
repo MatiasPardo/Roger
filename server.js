@@ -198,6 +198,94 @@ app.get('/api/admin/users', (req, res) => {
     }
 });
 
+app.delete('/api/admin/users/:userId', (req, res) => {
+    try {
+        const { userId } = req.params;
+        const userIndex = users.findIndex(u => u.id === userId);
+        
+        if (userIndex === -1) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+        
+        users.splice(userIndex, 1);
+        saveUsers();
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar usuario' });
+    }
+});
+
+app.put('/api/admin/users/:userId/reset-password', (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = users.find(u => u.id === userId);
+        
+        if (!user) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+        
+        user.password = 'roger1234';
+        saveUsers();
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al resetear contraseña' });
+    }
+});
+
+app.delete('/api/admin/gifts/:giftId', (req, res) => {
+    try {
+        const { giftId } = req.params;
+        const giftData = JSON.parse(fs.readFileSync(giftListPath, 'utf8'));
+        
+        let giftFound = false;
+        for (const category in giftData.gifts) {
+            const giftIndex = giftData.gifts[category].findIndex(g => g.id === parseInt(giftId));
+            if (giftIndex !== -1) {
+                giftData.gifts[category].splice(giftIndex, 1);
+                giftFound = true;
+                break;
+            }
+        }
+        
+        if (giftFound) {
+            giftData.timestamp = new Date().toISOString();
+            fs.writeFileSync(giftListPath, JSON.stringify(giftData, null, 2));
+            res.json({ success: true });
+        } else {
+            res.status(404).json({ error: 'Regalo no encontrado' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar regalo' });
+    }
+});
+
+app.post('/api/admin/gifts', (req, res) => {
+    try {
+        const { category, giftName } = req.body;
+        const giftData = JSON.parse(fs.readFileSync(giftListPath, 'utf8'));
+        
+        if (!giftData.gifts[category]) {
+            giftData.gifts[category] = [];
+        }
+        
+        const newId = Math.max(...Object.values(giftData.gifts).flat().map(g => g.id), 0) + 1;
+        const newGift = {
+            id: newId,
+            name: giftName,
+            reserved: false,
+            reservedBy: null
+        };
+        
+        giftData.gifts[category].push(newGift);
+        giftData.timestamp = new Date().toISOString();
+        fs.writeFileSync(giftListPath, JSON.stringify(giftData, null, 2));
+        
+        res.json({ success: true, gift: newGift });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al crear regalo' });
+    }
+});
+
 app.get('/api/admin/dashboard', (req, res) => {
     try {
         const attendanceData = JSON.parse(fs.readFileSync(attendancePath, 'utf8'));

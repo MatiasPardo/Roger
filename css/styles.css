@@ -594,8 +594,48 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: gradient 3s ease infinite;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
     text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+}
+
+.event-time {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #00ffff;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+.event-location {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.location-icon {
+    font-size: 2rem;
+    color: #ff69b4;
+}
+
+.location-text {
+    text-align: left;
+}
+
+.location-text div {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    line-height: 1.4;
+}
+
+.location-text div:first-child {
+    font-weight: 700;
+    color: #ff69b4;
 }
 
 .event-details {
