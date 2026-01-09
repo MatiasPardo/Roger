@@ -226,7 +226,6 @@ class LoginController {
     }
 
     navigateToConfirmation() {
-        // Por ahora redirige a la página principal, pero podrías crear una página de confirmación
         const container = document.querySelector('.container');
         if (container) {
             container.style.transition = 'all 0.5s ease';
@@ -234,7 +233,7 @@ class LoginController {
             container.style.opacity = '0';
             
             setTimeout(() => {
-                window.location.href = 'babyshower.html';
+                window.location.replace('babyshower.html');
             }, 500);
         }
     }
