@@ -445,6 +445,34 @@ app.get('/api/attendance/check/:email', (req, res) => {
     }
 });
 
+app.post('/api/gifts/update', (req, res) => {
+    try {
+        const { giftId, newName, userInfo } = req.body;
+        const giftData = JSON.parse(fs.readFileSync(giftListPath, 'utf8'));
+        
+        let giftFound = false;
+        for (const category in giftData.gifts) {
+            const gift = giftData.gifts[category].find(g => g.id === giftId);
+            if (gift && gift.reservedBy && gift.reservedBy.email === userInfo.email) {
+                gift.name = newName;
+                gift.lastModified = new Date().toISOString();
+                giftFound = true;
+                break;
+            }
+        }
+        
+        if (giftFound) {
+            giftData.timestamp = new Date().toISOString();
+            fs.writeFileSync(giftListPath, JSON.stringify(giftData, null, 2));
+            res.json({ success: true });
+        } else {
+            res.status(400).json({ error: 'No tienes permisos para modificar este regalo' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error al modificar regalo' });
+    }
+});
+
 app.post('/api/admin/login', (req, res) => {
     const { username, password } = req.body;
     

@@ -229,6 +229,32 @@ class GiftList {
         return reservations;
     }
 
+    async updateGift(giftId, newName, userInfo) {
+        try {
+            const response = await fetch('/api/gifts/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ giftId, newName, userInfo })
+            });
+            
+            if (response.ok) {
+                // Actualizar gifts local
+                for (const category in this.gifts) {
+                    const gift = this.gifts[category].find(g => g.id === giftId);
+                    if (gift && gift.reservedBy && gift.reservedBy.email === userInfo.email) {
+                        gift.name = newName;
+                        gift.lastModified = new Date().toISOString();
+                        localStorage.setItem(this.storageKey, JSON.stringify(this.gifts));
+                        return true;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error modificando regalo:', error);
+        }
+        return false;
+    }
+
     isAdmin(userEmail) {
         const adminEmails = ['admin@babyshower.com', 'roger@admin.com'];
         return adminEmails.includes(userEmail.toLowerCase());

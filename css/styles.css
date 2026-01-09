@@ -11,6 +11,12 @@ body {
     margin: 0;
     padding: 0;
     position: relative;
+    /* Fixes para Safari/iOS */
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: white;
+    overflow-x: hidden;
 }
 
 /* Estrellas animadas */
@@ -512,13 +518,13 @@ body {
 .baby-main-title {
     font-size: 3.5rem;
     font-weight: 900;
-    background: linear-gradient(45deg, #ff69b4, #ff1493, #ffc0cb);
+    background: linear-gradient(45deg, #00bfff, #0080ff, #00ffff);
     background-size: 300% 300%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: gradient 3s ease infinite;
     margin-bottom: 20px;
-    text-shadow: 0 0 30px rgba(255, 105, 180, 0.5);
+    text-shadow: 0 0 30px rgba(0, 191, 255, 0.5);
 }
 
 .baby-name {
@@ -537,9 +543,9 @@ body {
 }
 
 .highlight {
-    color: #ff69b4;
+    color: #00bfff;
     font-weight: 700;
-    text-shadow: 0 0 15px rgba(255, 105, 180, 0.6);
+    text-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
 }
 
 .scroll-indicator {
@@ -569,8 +575,8 @@ body {
 }
 
 .event-card {
-    border-color: rgba(255, 105, 180, 0.3);
-    box-shadow: 0 25px 45px rgba(255, 105, 180, 0.2);
+    border-color: rgba(0, 191, 255, 0.3);
+    box-shadow: 0 25px 45px rgba(0, 191, 255, 0.2);
 }
 
 .event-icon {
@@ -581,9 +587,9 @@ body {
 
 .event-title {
     font-size: 2rem;
-    color: #ff69b4;
+    color: #00bfff;
     margin-bottom: 20px;
-    text-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+    text-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
 }
 
 .event-date {
@@ -620,7 +626,7 @@ body {
 
 .location-icon {
     font-size: 2rem;
-    color: #ff69b4;
+    color: #00bfff;
 }
 
 .location-text {
@@ -635,7 +641,7 @@ body {
 
 .location-text div:first-child {
     font-weight: 700;
-    color: #ff69b4;
+    color: #00bfff;
 }
 
 .event-details {
@@ -740,7 +746,7 @@ body {
 }
 
 .view-gifts-btn {
-    background: linear-gradient(45deg, #ff69b4, #ff1493);
+    background: linear-gradient(45deg, #00bfff, #0080ff);
     border: none;
     padding: 15px 30px;
     border-radius: 25px;
@@ -750,12 +756,12 @@ body {
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 10px 25px rgba(255, 105, 180, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 191, 255, 0.3);
 }
 
 .view-gifts-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 35px rgba(255, 105, 180, 0.5);
+    box-shadow: 0 15px 35px rgba(0, 191, 255, 0.5);
 }
 
 .gift-modal {
@@ -776,7 +782,7 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(0, 0, 0, 0.9);
-    border: 2px solid rgba(255, 105, 180, 0.5);
+    border: 2px solid rgba(0, 191, 255, 0.5);
     border-radius: 20px;
     width: 90%;
     max-width: 800px;
@@ -790,11 +796,11 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 20px 30px;
-    border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+    border-bottom: 1px solid rgba(0, 191, 255, 0.3);
 }
 
 .gift-modal-header h2 {
-    color: #ff69b4;
+    color: #00bfff;
     margin: 0;
     font-size: 1.8rem;
 }
@@ -802,14 +808,14 @@ body {
 .close-modal {
     background: none;
     border: none;
-    color: #ff69b4;
+    color: #00bfff;
     font-size: 2rem;
     cursor: pointer;
     transition: color 0.3s ease;
 }
 
 .close-modal:hover {
-    color: #ff1493;
+    color: #0080ff;
 }
 
 .gift-modal-body {
@@ -849,7 +855,7 @@ body {
 
 .gift-item:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 105, 180, 0.3);
+    border-color: rgba(0, 191, 255, 0.3);
 }
 
 .gift-item.reserved {
@@ -905,6 +911,27 @@ body {
     cursor: not-allowed;
 }
 
+.edit-btn {
+    background: linear-gradient(45deg, #ffa500, #ff8c00);
+    border: none;
+    padding: 4px 8px;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-btn:hover {
+    transform: scale(1.1);
+    background: linear-gradient(45deg, #ff8c00, #ff7f00);
+}
+
 .add-gift-section {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -914,7 +941,7 @@ body {
 }
 
 .add-gift-section h3 {
-    color: #ff69b4;
+    color: #00bfff;
     margin-bottom: 15px;
 }
 
@@ -936,7 +963,7 @@ body {
 }
 
 .add-gift-btn {
-    background: linear-gradient(45deg, #ff69b4, #ff1493);
+    background: linear-gradient(45deg, #00bfff, #0080ff);
     border: none;
     padding: 12px 25px;
     border-radius: 20px;
@@ -949,7 +976,7 @@ body {
 
 .add-gift-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4);
+    box-shadow: 0 8px 20px rgba(0, 191, 255, 0.4);
 }
 
 @keyframes slideUp {
