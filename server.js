@@ -159,11 +159,11 @@ app.post('/api/auth/login', (req, res) => {
         const { email, password } = req.body;
         
         // Verificar admin
-        if (email.toLowerCase() === 'admin' && password === 'adminRoger1234') {
+        if (email.toLowerCase() === 'admin@admin.com' && password === 'adminRoger1234') {
             return res.json({ 
                 success: true, 
                 user: { 
-                    email: 'admin', 
+                    email: 'admin@admin.com', 
                     username: 'admin', 
                     firstName: 'Admin', 
                     lastName: 'System',
@@ -186,6 +186,31 @@ app.post('/api/auth/login', (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ error: 'Error en el login' });
+    }
+});
+
+app.get('/api/admin/users', (req, res) => {
+    try {
+        const usersWithoutPasswords = users.map(({ password, ...user }) => user);
+        res.json({ users: usersWithoutPasswords });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener usuarios' });
+    }
+});
+
+app.get('/api/admin/dashboard', (req, res) => {
+    try {
+        const attendanceData = JSON.parse(fs.readFileSync(attendancePath, 'utf8'));
+        const giftData = JSON.parse(fs.readFileSync(giftListPath, 'utf8'));
+        const usersWithoutPasswords = users.map(({ password, ...user }) => user);
+        
+        res.json({
+            users: usersWithoutPasswords,
+            confirmations: attendanceData.confirmations,
+            gifts: giftData.gifts
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener datos del dashboard' });
     }
 });
 
@@ -251,8 +276,13 @@ app.post('/api/gifts/add', (req, res) => {
         const newGift = {
             id: newId,
             name: giftName,
-            reserved: false,
-            reservedBy: null,
+            reserved: true,
+            reservedBy: {
+                username: userInfo.username,
+                email: userInfo.email,
+                fullName: userInfo.fullName,
+                reservedDate: new Date().toISOString()
+            },
             addedBy: userInfo.username,
             addedDate: new Date().toISOString()
         };
@@ -332,7 +362,7 @@ initializeAttendanceList();
 loadUsers();
 
 app.listen(3001, () => {
-    console.log('Servidor ejecutándose en http://pardos.com.ar:3001');
+    console.log('Servidor ejecutándose en http://localhost:3001');
     console.log('Lista de regalos disponible en /api/gifts');
     console.log('Confirmaciones de asistencia en /api/attendance');
 });

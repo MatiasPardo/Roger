@@ -48,7 +48,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch('/api/admin/login', {
+            const response = await fetch('http://localhost:3001/api/admin/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
@@ -105,87 +105,84 @@ class AdminPanel {
     }
 
     async loadAdminData() {
-        await this.loadAttendanceData();
-        await this.loadGiftsData();
+        try {
+            const response = await fetch('http://localhost:3001/api/admin/dashboard');
+            const data = await response.json();
+            
+            this.updateAttendanceStats(data.users, data.confirmations);
+            this.updateGiftsStats(data.gifts);
+            this.updateAttendanceTable(data.users, data.confirmations);
+            this.updateGiftsTable(data.gifts);
+        } catch (error) {
+            console.error('Error cargando datos del admin:', error);
+        }
     }
 
     async loadAttendanceData() {
-        try {
-            // Cargar confirmaciones
-            const attendanceResponse = await fetch('/api/attendance');
-            const attendanceData = await attendanceResponse.json();
-
-            // Cargar usuarios registrados
-            const usersResponse = await fetch('/api/users');
-            let totalRegistered = 0;
-            
-            // Si no hay endpoint de usuarios, usar localStorage como fallback
-            const storedUsers = localStorage.getItem('registeredUsers');
-            if (storedUsers) {
-                totalRegistered = JSON.parse(storedUsers).length;
-            }
-
-            // Actualizar estadísticas
-            const totalConfirmed = attendanceData.confirmations.length;
-            const totalPending = Math.max(0, totalRegistered - totalConfirmed);
-
-            document.getElementById('totalConfirmed').textContent = totalConfirmed;
-            document.getElementById('totalRegistered').textContent = totalRegistered;
-            document.getElementById('totalPending').textContent = totalPending;
-
-            // Actualizar tabla
-            this.updateAttendanceTable(attendanceData.confirmations);
-
-        } catch (error) {
-            console.error('Error cargando datos de asistencia:', error);
-        }
+        await this.loadAdminData();
     }
 
     async loadGiftsData() {
-        try {
-            const response = await fetch('/api/gifts');
-            const giftData = await response.json();
-
-            let totalGifts = 0;
-            let reservedGifts = 0;
-            const allGifts = [];
-
-            // Procesar todas las categorías
-            for (const [category, gifts] of Object.entries(giftData.gifts)) {
-                gifts.forEach(gift => {
-                    totalGifts++;
-                    if (gift.reserved) reservedGifts++;
-                    allGifts.push({ ...gift, category });
-                });
-            }
-
-            const availableGifts = totalGifts - reservedGifts;
-
-            // Actualizar estadísticas
-            document.getElementById('totalGifts').textContent = totalGifts;
-            document.getElementById('reservedGifts').textContent = reservedGifts;
-            document.getElementById('availableGifts').textContent = availableGifts;
-
-            // Actualizar tabla
-            this.updateGiftsTable(allGifts);
-
-        } catch (error) {
-            console.error('Error cargando datos de regalos:', error);
-        }
+        await this.loadAdminData();
     }
 
-    updateAttendanceTable(confirmations) {
+    updateAttendanceStats(users, confirmations) {
+        const totalRegistered = users.length;
+        const totalConfirmed = confirmations.length;
+        const totalPending = totalRegistered - totalConfirmed;
+
+        document.getElementById('totalConfirmed').textContent = totalConfirmed;
+        document.getElementById('totalRegistered').textContent = totalRegistered;
+        document.getElementById('totalPending').textContent = Math.max(0, totalPending);
+    }
+
+    updateGiftsStats(gifts) {
+        let totalGifts = 0;
+        let reservedGifts = 0;
+
+        for (const category in gifts) {
+            gifts[category].forEach(gift => {
+                totalGifts++;
+                if (gift.reserved) reservedGifts++;
+            });
+        }
+
+        const availableGifts = totalGifts - reservedGifts;
+        document.getElementById('totalGifts').textContent = totalGifts;
+        document.getElementById('reservedGifts').textContent = reservedGifts;
+        document.getElementById('availableGifts').textContent = availableGifts;
+    }
+
+    updateAttendanceTable(users, confirmations) {
         const tbody = document.getElementById('attendanceTableBody');
         tbody.innerHTML = '';
 
-        confirmations.forEach(confirmation => {
+        // Crear un mapa de confirmaciones por email
+        const confirmationMap = {};
+        confirmations.forEach(conf => {
+            confirmationMap[conf.email] = conf;
+        });
+
+        // Mostrar todos los usuarios registrados
+        users.forEach(user => {
             const row = document.createElement('tr');
+            const confirmation = confirmationMap[user.email];
+            
+            let statusHtml, dateHtml;
+            if (confirmation) {
+                statusHtml = '<span class="confirmed">✓ Confirmado</span>';
+                dateHtml = new Date(confirmation.confirmationDate).toLocaleString('es-ES');
+            } else {
+                statusHtml = '<span class="available">⏳ Pendiente</span>';
+                dateHtml = '-';
+            }
+
             row.innerHTML = `
-                <td>${confirmation.fullName || 'N/A'}</td>
-                <td>${confirmation.username}</td>
-                <td>${confirmation.email}</td>
-                <td>${new Date(confirmation.confirmationDate).toLocaleString('es-ES')}</td>
-                <td><span class="confirmed">✓ Confirmado</span></td>
+                <td>${user.firstName} ${user.lastName}</td>
+                <td>${user.username}</td>
+                <td>${user.email}</td>
+                <td>${dateHtml}</td>
+                <td>${statusHtml}</td>
             `;
             tbody.appendChild(row);
         });
@@ -201,35 +198,37 @@ class AdminPanel {
             home: 'Para el Hogar'
         };
 
-        gifts.forEach(gift => {
-            const row = document.createElement('tr');
-            const categoryName = categoryNames[gift.category] || gift.category;
-            
-            let statusHtml, reservedByHtml, reservedDateHtml;
-            
-            if (gift.reserved) {
-                statusHtml = '<span class="reserved">🔒 Reservado</span>';
-                reservedByHtml = gift.reservedBy ? 
-                    `${gift.reservedBy.fullName || gift.reservedBy.username} (${gift.reservedBy.email})` : 
-                    'Desconocido';
-                reservedDateHtml = gift.reservedBy && gift.reservedBy.reservedDate ? 
-                    new Date(gift.reservedBy.reservedDate).toLocaleString('es-ES') : 
-                    'N/A';
-            } else {
-                statusHtml = '<span class="available">🔓 Disponible</span>';
-                reservedByHtml = '-';
-                reservedDateHtml = '-';
-            }
+        for (const [category, giftList] of Object.entries(gifts)) {
+            giftList.forEach(gift => {
+                const row = document.createElement('tr');
+                const categoryName = categoryNames[category] || category;
+                
+                let statusHtml, reservedByHtml, reservedDateHtml;
+                
+                if (gift.reserved) {
+                    statusHtml = '<span class="reserved">🔒 Reservado</span>';
+                    reservedByHtml = gift.reservedBy ? 
+                        `${gift.reservedBy.fullName || gift.reservedBy.username} (${gift.reservedBy.email})` : 
+                        'Desconocido';
+                    reservedDateHtml = gift.reservedBy && gift.reservedBy.reservedDate ? 
+                        new Date(gift.reservedBy.reservedDate).toLocaleString('es-ES') : 
+                        'N/A';
+                } else {
+                    statusHtml = '<span class="available">🔓 Disponible</span>';
+                    reservedByHtml = '-';
+                    reservedDateHtml = '-';
+                }
 
-            row.innerHTML = `
-                <td>${categoryName}</td>
-                <td>${gift.name}</td>
-                <td>${statusHtml}</td>
-                <td>${reservedByHtml}</td>
-                <td>${reservedDateHtml}</td>
-            `;
-            tbody.appendChild(row);
-        });
+                row.innerHTML = `
+                    <td>${categoryName}</td>
+                    <td>${gift.name}</td>
+                    <td>${statusHtml}</td>
+                    <td>${reservedByHtml}</td>
+                    <td>${reservedDateHtml}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
     }
 
     showMessage(message, type) {
