@@ -92,8 +92,8 @@ class RegisterController {
 
         this.registerView.showLoadingState();
 
-        setTimeout(() => {
-            const result = this.userModel.register(formData);
+        setTimeout(async () => {
+            const result = await this.userModel.register(formData);
             
             if (result.success) {
                 this.handleSuccessfulRegister(result);

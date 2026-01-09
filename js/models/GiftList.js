@@ -2,13 +2,34 @@ class GiftList {
     constructor() {
         this.storageKey = 'babyShowerGifts';
         this.confirmationsKey = 'giftConfirmations';
+        this.gifts = {};
         this.loadGifts();
-        this.initializeDefaultGifts();
     }
 
-    loadGifts() {
+    async loadGifts() {
+        try {
+            const response = await fetch('/api/gifts');
+            if (response.ok) {
+                const data = await response.json();
+                this.gifts = data.gifts;
+                // Sincronizar con localStorage como backup
+                localStorage.setItem(this.storageKey, JSON.stringify(this.gifts));
+            } else {
+                // Fallback a localStorage si el servidor no responde
+                this.loadFromLocalStorage();
+            }
+        } catch (error) {
+            console.error('Error cargando regalos del servidor:', error);
+            this.loadFromLocalStorage();
+        }
+    }
+
+    loadFromLocalStorage() {
         const stored = localStorage.getItem(this.storageKey);
         this.gifts = stored ? JSON.parse(stored) : {};
+        if (Object.keys(this.gifts).length === 0) {
+            this.initializeDefaultGifts();
+        }
     }
 
     saveGifts() {
@@ -77,43 +98,58 @@ class GiftList {
         return this.gifts[category] || [];
     }
 
-    addGift(category, giftName, userInfo) {
-        if (!this.gifts[category]) {
-            this.gifts[category] = [];
+    async addGift(category, giftName, userInfo) {
+        try {
+            const response = await fetch('/api/gifts/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category, giftName, userInfo })
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                // Actualizar gifts local
+                if (!this.gifts[category]) {
+                    this.gifts[category] = [];
+                }
+                this.gifts[category].push(result.gift);
+                localStorage.setItem(this.storageKey, JSON.stringify(this.gifts));
+                return result.gift;
+            }
+        } catch (error) {
+            console.error('Error agregando regalo:', error);
         }
-
-        const newId = Math.max(...Object.values(this.gifts).flat().map(g => g.id), 0) + 1;
-        const newGift = {
-            id: newId,
-            name: giftName,
-            reserved: false,
-            reservedBy: null,
-            addedBy: userInfo.username,
-            addedDate: new Date().toISOString()
-        };
-
-        this.gifts[category].push(newGift);
-        this.saveGifts();
-        
-        return newGift;
+        return null;
     }
 
-    reserveGift(giftId, userInfo) {
-        for (const category in this.gifts) {
-            const gift = this.gifts[category].find(g => g.id === giftId);
-            if (gift && !gift.reserved) {
-                gift.reserved = true;
-                gift.reservedBy = {
-                    username: userInfo.username,
-                    email: userInfo.email,
-                    fullName: userInfo.fullName,
-                    reservedDate: new Date().toISOString()
-                };
-                
-                this.saveGifts();
-                this.saveConfirmation(gift, userInfo);
-                return true;
+    async reserveGift(giftId, userInfo) {
+        try {
+            const response = await fetch('/api/gifts/reserve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ giftId, userInfo })
+            });
+            
+            if (response.ok) {
+                // Actualizar gifts local
+                for (const category in this.gifts) {
+                    const gift = this.gifts[category].find(g => g.id === giftId);
+                    if (gift && !gift.reserved) {
+                        gift.reserved = true;
+                        gift.reservedBy = {
+                            username: userInfo.username,
+                            email: userInfo.email,
+                            fullName: userInfo.fullName,
+                            reservedDate: new Date().toISOString()
+                        };
+                        localStorage.setItem(this.storageKey, JSON.stringify(this.gifts));
+                        this.saveConfirmation(gift, userInfo);
+                        return true;
+                    }
+                }
             }
+        } catch (error) {
+            console.error('Error reservando regalo:', error);
         }
         return false;
     }

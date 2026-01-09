@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Baby Shower Roger</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        .admin-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .admin-header { text-align: center; margin-bottom: 30px; }
+        .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { padding: 10px 20px; background: #333; color: #00ff00; border: none; cursor: pointer; }
+        .tab-btn.active { background: #00ff00; color: #000; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: rgba(0, 255, 0, 0.1); border: 1px solid #00ff00; padding: 20px; text-align: center; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .data-table th, .data-table td { border: 1px solid #00ff00; padding: 10px; text-align: left; }
+        .data-table th { background: rgba(0, 255, 0, 0.2); }
+        .confirmed { color: #00ff00; }
+        .reserved { color: #ffd700; }
+        .available { color: #ff6b6b; }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    
+    <!-- Login Admin -->
+    <div id="adminLogin" class="container">
+        <div class="login-card">
+            <h2 class="login-title">ADMIN ACCESS</h2>
+            <form id="adminLoginForm" class="login-form">
+                <div class="input-group">
+                    <input type="text" id="adminUsername" required>
+                    <label for="adminUsername">Usuario Admin</label>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="adminPassword" required>
+                    <label for="adminPassword">Contraseña Admin</label>
+                </div>
+                <button type="submit" class="login-btn">
+                    <span>ACCEDER</span>
+                </button>
+            </form>
+            <div id="adminMessage" class="message"></div>
+        </div>
+    </div>
+
+    <!-- Panel Admin -->
+    <div id="adminPanel" class="admin-container" style="display: none;">
+        <div class="admin-header">
+            <h1>🎛️ PANEL DE ADMINISTRACIÓN</h1>
+            <h2>Baby Shower Roger Octavio Pardo</h2>
+            <button id="logoutAdmin" class="login-btn" style="margin-top: 10px;">Cerrar Sesión</button>
+        </div>
+
+        <div class="admin-tabs">
+            <button class="tab-btn active" data-tab="attendance">📋 Asistencia</button>
+            <button class="tab-btn" data-tab="gifts">🎁 Regalos</button>
+        </div>
+
+        <!-- Tab Asistencia -->
+        <div id="attendanceTab" class="tab-content active">
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Total Confirmados</h3>
+                    <div id="totalConfirmed" class="stat-number">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Registrados</h3>
+                    <div id="totalRegistered" class="stat-number">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Pendientes</h3>
+                    <div id="totalPending" class="stat-number">0</div>
+                </div>
+            </div>
+            
+            <h3>📋 Lista de Confirmaciones</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nombre Completo</th>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Fecha Confirmación</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tab Regalos -->
+        <div id="giftsTab" class="tab-content">
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Total Regalos</h3>
+                    <div id="totalGifts" class="stat-number">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Reservados</h3>
+                    <div id="reservedGifts" class="stat-number">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Disponibles</h3>
+                    <div id="availableGifts" class="stat-number">0</div>
+                </div>
+            </div>
+
+            <h3>🎁 Lista de Regalos</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Categoría</th>
+                        <th>Regalo</th>
+                        <th>Estado</th>
+                        <th>Reservado Por</th>
+                        <th>Fecha Reserva</th>
+                    </tr>
+                </thead>
+                <tbody id="giftsTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>

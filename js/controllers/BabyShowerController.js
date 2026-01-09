@@ -4,6 +4,11 @@ class BabyShowerController {
         this.giftListModel = new GiftList();
         this.sessionManager = new SessionManager();
         this.babyShowerView = new BabyShowerView();
+        this.initializeApp();
+    }
+
+    async initializeApp() {
+        await this.giftListModel.loadGifts();
         this.initializeEventListeners();
         this.checkUserAuthentication();
     }
@@ -45,13 +50,25 @@ class BabyShowerController {
         this.checkAttendanceStatus();
     }
 
-    checkAttendanceStatus() {
+    async checkAttendanceStatus() {
         const userEmail = localStorage.getItem('userEmail');
-        const confirmedAttendance = localStorage.getItem(`attendance_${userEmail}`);
         
-        if (confirmedAttendance === 'true') {
-            this.showAlreadyConfirmed();
-            this.showGiftListOption();
+        try {
+            const response = await fetch(`/api/attendance/check/${encodeURIComponent(userEmail)}`);
+            if (response.ok) {
+                const result = await response.json();
+                if (result.confirmed) {
+                    this.showAlreadyConfirmed();
+                    this.showGiftListOption();
+                }
+            }
+        } catch (error) {
+            // Fallback a localStorage
+            const confirmedAttendance = localStorage.getItem(`attendance_${userEmail}`);
+            if (confirmedAttendance === 'true') {
+                this.showAlreadyConfirmed();
+                this.showGiftListOption();
+            }
         }
     }
 
@@ -195,29 +212,49 @@ class BabyShowerController {
         
         const userEmail = localStorage.getItem('userEmail');
         const username = localStorage.getItem('username');
-        
-        console.log('UserEmail:', userEmail);
-        console.log('Username:', username);
+        const userFullName = localStorage.getItem('userFullName');
         
         if (!userEmail) {
-            console.error('No hay userEmail');
             alert('Error: Usuario no identificado');
             return;
         }
 
-        // Verificar si ya confirmó
-        const alreadyConfirmed = localStorage.getItem(`attendance_${userEmail}`);
-        console.log('Ya confirmado:', alreadyConfirmed);
-        
-        if (alreadyConfirmed === 'true') {
-            alert('Ya confirmaste tu asistencia anteriormente');
-            return;
+        try {
+            const response = await fetch('/api/attendance/confirm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userInfo: {
+                        email: userEmail,
+                        username: username,
+                        fullName: userFullName
+                    }
+                })
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                this.processAttendanceConfirmation(userEmail, username);
+            } else {
+                const error = await response.json();
+                if (error.error === 'Ya confirmaste tu asistencia') {
+                    alert('Ya confirmaste tu asistencia anteriormente');
+                    this.showAlreadyConfirmed();
+                    this.showGiftListOption();
+                } else {
+                    throw new Error(error.error);
+                }
+            }
+        } catch (error) {
+            console.error('Error confirmando asistencia:', error);
+            // Fallback a localStorage
+            const alreadyConfirmed = localStorage.getItem(`attendance_${userEmail}`);
+            if (alreadyConfirmed === 'true') {
+                alert('Ya confirmaste tu asistencia anteriormente');
+                return;
+            }
+            this.processAttendanceConfirmation(userEmail, username);
         }
-
-        console.log('Procesando confirmación...');
-        
-        // Procesar confirmación directamente
-        this.processAttendanceConfirmation(userEmail, username);
     }
 
     processAttendanceConfirmation(userEmail, username) {
@@ -372,14 +409,15 @@ class BabyShowerController {
         return giftDiv;
     }
 
-    reserveGift(giftId) {
+    async reserveGift(giftId) {
         const userInfo = {
             username: localStorage.getItem('username'),
             email: localStorage.getItem('userEmail'),
             fullName: localStorage.getItem('userFullName')
         };
         
-        if (this.giftListModel.reserveGift(giftId, userInfo)) {
+        const success = await this.giftListModel.reserveGift(giftId, userInfo);
+        if (success) {
             // Recargar la lista para mostrar el cambio visual
             this.loadGiftList();
             
@@ -427,7 +465,7 @@ class BabyShowerController {
         }
     }
 
-    addNewGift() {
+    async addNewGift() {
         const category = document.getElementById('giftCategory').value;
         const giftName = document.getElementById('giftName').value.trim();
         
@@ -442,28 +480,30 @@ class BabyShowerController {
             fullName: localStorage.getItem('userFullName')
         };
         
-        this.giftListModel.addGift(category, giftName, userInfo);
-        document.getElementById('giftName').value = '';
-        this.loadGiftList();
-        
-        // Mostrar mensaje de éxito
-        const successMsg = document.createElement('div');
-        successMsg.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 255, 0, 0.9);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            z-index: 3000;
-            animation: slideInRight 0.5s ease, fadeOut 0.5s ease 2s forwards;
-        `;
-        successMsg.textContent = '¡Regalo agregado exitosamente!';
-        document.body.appendChild(successMsg);
-        
-        setTimeout(() => {
-            successMsg.remove();
-        }, 3000);
+        const newGift = await this.giftListModel.addGift(category, giftName, userInfo);
+        if (newGift) {
+            document.getElementById('giftName').value = '';
+            this.loadGiftList();
+            
+            // Mostrar mensaje de éxito
+            const successMsg = document.createElement('div');
+            successMsg.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(0, 255, 0, 0.9);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                z-index: 3000;
+                animation: slideInRight 0.5s ease, fadeOut 0.5s ease 2s forwards;
+            `;
+            successMsg.textContent = '¡Regalo agregado exitosamente!';
+            document.body.appendChild(successMsg);
+            
+            setTimeout(() => {
+                successMsg.remove();
+            }, 3000);
+        }
     }
 }

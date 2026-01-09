@@ -53,6 +53,14 @@ class LoginController {
     }
 
     handleSuccessfulLogin(user) {
+        if (user.isAdmin) {
+            this.loginView.showMessage('Acceso de administrador autorizado', 'success');
+            setTimeout(() => {
+                window.location.href = 'admin.html';
+            }, 1500);
+            return;
+        }
+        
         this.loginView.showMessage(`¡Bienvenido ${user.username}! Asistencia confirmada`, 'success');
         
         // Efecto de éxito

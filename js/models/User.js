@@ -9,12 +9,12 @@ class User {
         this.users = stored ? JSON.parse(stored) : [];
     }
 
-    saveUsers() {
+    async saveUsers() {
         localStorage.setItem(this.storageKey, JSON.stringify(this.users));
-        this.saveToFile();
+        await this.saveToFile();
     }
 
-    saveToFile() {
+    async saveToFile() {
         const userData = {
             timestamp: new Date().toISOString(),
             users: this.users.map(user => ({
@@ -26,15 +26,15 @@ class User {
             }))
         };
         
-        const blob = new Blob([JSON.stringify(userData, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `usuarios_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        try {
+            await fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+        } catch (error) {
+            console.error('Error guardando archivo:', error);
+        }
     }
 
     validatePassword(password) {
@@ -57,7 +57,7 @@ class User {
         return 'strong';
     }
 
-    register(userData) {
+    async register(userData) {
         if (this.emailExists(userData.email)) {
             return { success: false, message: 'Este email ya está registrado' };
         }
@@ -74,12 +74,27 @@ class User {
         };
         
         this.users.push(newUser);
-        this.saveUsers();
+        await this.saveUsers();
         
         return { success: true, message: 'Usuario registrado exitosamente', user: newUser };
     }
 
     authenticate(email, password) {
+        // Verificar si es admin
+        if (email.toLowerCase() === 'admin' && password === 'adminRoger1234') {
+            return { 
+                success: true, 
+                user: { 
+                    email: 'admin', 
+                    username: 'admin', 
+                    firstName: 'Admin', 
+                    lastName: 'System',
+                    isAdmin: true 
+                } 
+            };
+        }
+        
+        // Autenticación normal
         const user = this.users.find(u => 
             u.email.toLowerCase() === email.toLowerCase() && 
             u.password === password
