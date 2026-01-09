@@ -249,7 +249,7 @@ class AdminPanel {
         if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
         
         try {
-            const response = await fetch(`http://localhost:3001/api/admin/users/${userId}`, {
+            const response = await fetch(`/api/admin/users/${userId}`, {
                 method: 'DELETE'
             });
             
@@ -266,7 +266,7 @@ class AdminPanel {
         if (!confirm('¿Resetear contraseña a "roger1234"?')) return;
         
         try {
-            const response = await fetch(`http://localhost:3001/api/admin/users/${userId}/reset-password`, {
+            const response = await fetch(`/api/admin/users/${userId}/reset-password`, {
                 method: 'PUT'
             });
             
@@ -282,7 +282,7 @@ class AdminPanel {
         if (!confirm('¿Estás seguro de eliminar este regalo?')) return;
         
         try {
-            const response = await fetch(`http://localhost:3001/api/admin/gifts/${giftId}`, {
+            const response = await fetch(`/api/admin/gifts/${giftId}`, {
                 method: 'DELETE'
             });
             
@@ -308,7 +308,7 @@ class AdminPanel {
 
     async addGift(category, giftName) {
         try {
-            const response = await fetch('http://localhost:3001/api/admin/gifts', {
+            const response = await fetch('/api/admin/gifts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ category, giftName })
