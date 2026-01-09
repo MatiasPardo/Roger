@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Confirmar Asistencia</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="container">
+        <div class="login-card">
+            <div class="scanner-line"></div>
+            <h2 class="login-title">ACCESO AUTORIZADO</h2>
+            <form id="loginForm" class="login-form">
+                <div class="input-group">
+                    <input type="email" id="email" required>
+                    <label for="email">Correo Electrónico</label>
+                    <div class="input-glow"></div>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" required>
+                    <label for="password">Contraseña</label>
+                    <div class="input-glow"></div>
+                </div>
+                <button type="submit" class="login-btn">
+                    <span>INICIAR SESIÓN</span>
+                    <div class="btn-pulse"></div>
+                </button>
+            </form>
+            <div class="form-links">
+                <a href="register.html" class="link">¿No tienes cuenta? Regístrate</a>
+            </div>
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+    
+    <script src="js/models/User.js"></script>
+    <script src="js/models/SessionManager.js"></script>
+    <script src="js/views/LoginView.js"></script>
+    <script src="js/controllers/LoginController.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>

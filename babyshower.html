@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baby Shower - Roger Octavio Pardo</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="baby-shower-container">
+        <section class="welcome-section">
+            <div class="baby-card">
+                <div class="baby-title">BIENVENIDO AL</div>
+                <div class="baby-main-title">BABY SHOWER</div>
+                <div class="baby-name">ROGER OCTAVIO PARDO</div>
+                <div class="baby-message">
+                    Sos uno de los invitados especiales a compartir un hermoso día con
+                    <span class="highlight">Los papis de Roger</span>
+                </div>
+                <div class="scroll-indicator">
+                    <div class="scroll-arrow">↓</div>
+                    <div class="scroll-text">Desliza para más información</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="event-section">
+            <div class="event-card">
+                <div class="event-icon">👶</div>
+                <div class="event-title">FECHA DEL EVENTO</div>
+                <div class="event-date">SÁBADO 17/01/2026</div>
+                <div class="event-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">🎉</span>
+                        <span>Celebración especial</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">💝</span>
+                        <span>Momentos únicos</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">👨‍👩‍👶</span>
+                        <span>Familia y amigos</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="confirmation-section">
+            <div class="confirmation-card">
+                <div class="confirmation-title">¿CONFIRMAS TU ASISTENCIA?</div>
+                <div class="confirmation-subtitle">Tu presencia hará este día aún más especial</div>
+                <button id="confirmBtn" class="confirm-btn">
+                    <span>CONFIRMAR ASISTENCIA</span>
+                    <div class="btn-sparkle"></div>
+                </button>
+                <div id="confirmationMessage" class="confirmation-message"></div>
+                <div id="giftListSection" class="gift-list-section" style="display: none;">
+                    <button id="viewGiftsBtn" class="view-gifts-btn">
+                        <span>🎁 VER LISTA DE REGALOS</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal de Lista de Regalos -->
+        <div id="giftModal" class="gift-modal">
+            <div class="gift-modal-content">
+                <div class="gift-modal-header">
+                    <h2>🎁 Lista de Regalos para Roger</h2>
+                    <button id="closeModal" class="close-modal">&times;</button>
+                </div>
+                <div class="gift-modal-body">
+                    <div class="gift-categories">
+                        <div class="gift-category">
+                            <h3>👶 Para el Bebé</h3>
+                            <div id="babyGifts" class="gift-items"></div>
+                        </div>
+                        <div class="gift-category">
+                            <h3>👩 Para la Mamá</h3>
+                            <div id="momGifts" class="gift-items"></div>
+                        </div>
+                        <div class="gift-category">
+                            <h3>🏠 Para el Hogar</h3>
+                            <div id="homeGifts" class="gift-items"></div>
+                        </div>
+                    </div>
+                    <div class="add-gift-section">
+                        <h3>➕ Agregar Regalo</h3>
+                        <select id="giftCategory">
+                            <option value="baby">Para el Bebé</option>
+                            <option value="mom">Para la Mamá</option>
+                            <option value="home">Para el Hogar</option>
+                        </select>
+                        <input type="text" id="giftName" placeholder="Nombre del regalo">
+                        <button id="addGiftBtn" class="add-gift-btn">Agregar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/models/User.js"></script>
+    <script src="js/models/SessionManager.js"></script>
+    <script src="js/components/GlobalUserWidget.js"></script>
+    <script src="js/models/GiftList.js"></script>
+    <script src="js/views/BabyShowerView.js"></script>
+    <script src="js/controllers/BabyShowerController.js"></script>
+    <script src="js/babyshower.js"></script>
+    <script>
+        // Inicializar widget global al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            GlobalUserWidget.init();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Confirmar Invitación</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="container">
+        <div class="register-card">
+            <div class="scanner-line"></div>
+            <h2 class="register-title">REGISTRO DE INVITADO</h2>
+            <form id="registerForm" class="register-form">
+                <div class="input-group">
+                    <input type="text" id="username" required>
+                    <label for="username">Usuario</label>
+                    <div class="input-glow"></div>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" required>
+                    <label for="password">Contraseña (min 8 caracteres, letras y números)</label>
+                    <div class="input-glow"></div>
+                    <div class="password-strength"></div>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="firstName" required>
+                    <label for="firstName">Nombre</label>
+                    <div class="input-glow"></div>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="lastName" required>
+                    <label for="lastName">Apellido</label>
+                    <div class="input-glow"></div>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="email" required>
+                    <label for="email">Correo Electrónico</label>
+                    <div class="input-glow"></div>
+                </div>
+                <div class="input-group">
+                    <input type="date" id="birthDate" required>
+                    <label for="birthDate">Fecha de Nacimiento</label>
+                    <div class="input-glow"></div>
+                </div>
+                <button type="submit" class="register-btn">
+                    <span>REGISTRARSE</span>
+                    <div class="btn-pulse"></div>
+                </button>
+            </form>
+            <div class="form-links">
+                <a href="login.html" class="link">¿Ya tienes cuenta? Inicia sesión</a>
+            </div>
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+    
+    <script src="js/models/User.js"></script>
+    <script src="js/models/SessionManager.js"></script>
+    <script src="js/views/RegisterView.js"></script>
+    <script src="js/controllers/RegisterController.js"></script>
+    <script src="js/register.js"></script>
+</body>
+</html>
