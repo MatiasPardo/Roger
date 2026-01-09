@@ -644,6 +644,11 @@ body {
     color: #00bfff;
 }
 
+.location-text div:nth-child(2) {
+    color: #00bfff;
+    font-weight: 600;
+}
+
 .event-details {
     display: flex;
     flex-direction: column;
