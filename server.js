@@ -10,6 +10,7 @@ app.use((req, res, next) => {
         /^https?:\/\/localhost(:\d+)?$/,
         /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
         /^https?:\/\/.*\.pardos\.com\.ar$/,
+        /^http?:\/\/.*\.pardos\.com\.ar$/,
         /^https?:\/\/pardos\.com\.ar$/
     ];
     
@@ -331,7 +332,7 @@ initializeAttendanceList();
 loadUsers();
 
 app.listen(3001, () => {
-    console.log('Servidor ejecutándose en http://localhost:3001');
+    console.log('Servidor ejecutándose en http://pardos.com.ar:3001');
     console.log('Lista de regalos disponible en /api/gifts');
     console.log('Confirmaciones de asistencia en /api/attendance');
 });
