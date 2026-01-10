@@ -38,7 +38,7 @@
                 <div class="event-location">
                     <div class="location-icon">📍</div>
                     <div class="location-text">
-                        <div>Estraba 687</div>
+                        <div>Estrada 687</div>
                         <div>Parque Chacabuco, CABA</div>
                     </div>
                 </div>
@@ -121,8 +121,17 @@
     <script src="js/controllers/BabyShowerController.js"></script>
     <script src="js/babyshower.js"></script>
     <script>
-        // Inicializar widget global al cargar la página
+        // Verificar sesión antes de cargar la página
         document.addEventListener('DOMContentLoaded', () => {
+            const authenticated = localStorage.getItem('authenticated');
+            const userEmail = localStorage.getItem('userEmail');
+            
+            if (!authenticated || !userEmail) {
+                console.log('Usuario no autenticado, redirigiendo...');
+                window.location.replace('index.html');
+                return;
+            }
+            
             GlobalUserWidget.init();
         });
     </script>

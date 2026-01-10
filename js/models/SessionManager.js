@@ -80,12 +80,20 @@ class SessionManager {
         localStorage.removeItem('username');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('userFullName');
-        console.log('Sesión destruida');
+        localStorage.removeItem('isAdmin');
+        // Limpiar cualquier confirmación de asistencia temporal
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('attendance_')) {
+                localStorage.removeItem(key);
+            }
+        });
+        console.log('Sesión destruida completamente');
     }
 
     logout() {
         this.destroySession();
-        window.location.href = 'index.html';
+        // Forzar recarga completa para limpiar cualquier estado
+        window.location.replace('index.html');
     }
 
     startSessionTimer() {

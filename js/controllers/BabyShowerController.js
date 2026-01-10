@@ -16,7 +16,8 @@ class BabyShowerController {
     checkUserAuthentication() {
         if (!this.sessionManager.checkSessionValidity()) {
             alert('Tu sesión ha expirado. Serás redirigido al inicio.');
-            window.location.href = 'index.html';
+            this.sessionManager.destroySession();
+            window.location.replace('index.html');
             return;
         }
 
